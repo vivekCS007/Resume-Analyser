@@ -1,22 +1,30 @@
+# Load environment variables from .env file
 from dotenv import load_dotenv
 load_dotenv()
 
 
+# Import necessary libraries
 import os
 import streamlit as st
 from PIL import Image
 import pdf2image
 import google.generativeai as generativeai
 from google.generativeai.types import content_types
+import base64
+import io
 
+# Configure the Gemini API using the key from environment variables
 generativeai.configure(
     api_key=os.getenv("GOOGLE_API")
 )
 
 
+# Function to send the input text, resume image, and prompt to Gemini AI and get response
 def get_ai_response(input_text, image_bytes, prompt):
     model = generativeai.GenerativeModel('gemini-1.5-flash')
 
+
+    # Send input as list of content parts (text + image + prompt)
     response = model.generate_content([
         {"text": input_text},
         {"inline_data": {
@@ -28,15 +36,16 @@ def get_ai_response(input_text, image_bytes, prompt):
 
     return response.text
 
-
-import base64
-import io
+# Function to convert first page of uploaded PDF to JPEG image bytes
 def input_pdf(pdf_file):
     if pdf_file is None:
         raise FileNotFoundError("File is not found")
 
+    # Convert PDF to image
     image_list = pdf2image.convert_from_bytes(pdf_file.read())
     first_page = image_list[0]
+
+    # Convert image to bytes (JPEG)
     img_bytes = io.BytesIO()
     first_page.save(img_bytes, format='JPEG')
     return img_bytes.getvalue()
@@ -44,6 +53,7 @@ def input_pdf(pdf_file):
 
 
 
+# Streamlit Page Configuration
 st.set_page_config(
     page_title="ATS System",
     page_icon=":tada:",
@@ -51,10 +61,16 @@ st.set_page_config(
 )
 
 
+# UI Title
 st.header("ATS System")
-input_text=st.text_input("Enter Job Description",key="input_text")
-pdf_file=st.file_uploader("Upload resume in PDF",type=["pdf"])
 
+# Job description input
+input_text=st.text_input("Enter Job Description", key="input_text")
+
+# Resume file upload input
+pdf_file=st.file_uploader("Upload resume in PDF", type=["pdf"])
+
+# Confirmation message if resume is uploaded
 if pdf_file is not None:
     st.write("Resume uploaded successfully")
 
@@ -63,6 +79,7 @@ submit2=st.button("How can i improve my skills")
 submit3=st.button("Tell Important Keyword that are missing in resume")
 submit4=st.button("Percentage match")
 
+# Prompt 1: Resume summary and evaluation by HR
 input_prompt1 = """
 You are an experienced technical HR professional with tech experience in field of Data Science, Full stack development, Big Data Enginering, DEVOPS, Data Analyst and resume evaluator. Carefully review the provided resume and compare it against the job description.
 Summarize the candidate’s key qualifications, including their:
@@ -77,6 +94,7 @@ Highlight the strengths and weaknesses of the candidate in relation to the speci
 requirements for the job."""
 
 
+# Prompt 2: Improvement suggestions for skills based on resume
 input_prompt2 = """
 You are acting as a career coach. Analyze the resume in the context of the given job description.
 Identify the specific skills, tools, technologies, or experience areas that the candidate is currently lacking or should strengthen to become a stronger match for the position.
@@ -89,6 +107,7 @@ Your suggestions should be:
 Present your answer as an actionable improvement plan the candidate can follow.
 """
 
+# Prompt 3: Extract missing keywords in the resume
 input_prompt3 = """
 You are functioning as an Applicant Tracking System (ATS). Compare the resume content with the job description and identify:
 - Important keywords (technical terms, tools, role-specific jargon)
@@ -100,6 +119,7 @@ List the keywords and concepts that are present in the job description but missi
 Format the output as a list, and optionally explain why each keyword might be important for this role.
 """
 
+# Prompt 4: Calculate and explain resume-job match percentage
 input_prompt4 = """
 You are a resume screening assistant trained to estimate job match percentages. Carefully review the resume and compare it against the job description.
 
@@ -119,36 +139,38 @@ Also, include a breakdown like:
 Be objective, concise, and helpful.
 """
 
-
+# Handle "Tell about resume" button click
 if submit1:
     if pdf_file is None:
         st.write("Please upload resume")
     else:
-        image_bytes=input_pdf(pdf_file)
-        ai_response=get_ai_response(input_text,image_bytes,input_prompt1)
+        image_bytes = input_pdf(pdf_file)
+        ai_response = get_ai_response(input_text, image_bytes, input_prompt1)
         st.write(ai_response)
 
-
+# Handle "How can I improve my skills" button click
 if submit2:
     if pdf_file is None:
         st.write("Please upload resume")
     else:
-        image_bytes=input_pdf(pdf_file)
-        ai_response=get_ai_response(input_text,image_bytes,input_prompt2)
+        image_bytes = input_pdf(pdf_file)
+        ai_response = get_ai_response(input_text, image_bytes, input_prompt2)
         st.write(ai_response)
 
+# Handle "Tell Important Keyword that are missing in resume" button click
 if submit3:
     if pdf_file is None:
         st.write("Please upload resume")
     else:
-        image_bytes=input_pdf(pdf_file)
-        ai_response=get_ai_response(input_text,image_bytes,input_prompt3)
+        image_bytes = input_pdf(pdf_file)
+        ai_response = get_ai_response(input_text, image_bytes, input_prompt3)
         st.write(ai_response)
 
+# Handle "Percentage match" button click
 if submit4:
     if pdf_file is None:
         st.write("Please upload resume")
     else:
-        image_bytes=input_pdf(pdf_file)
-        ai_response=get_ai_response(input_text,image_bytes,input_prompt4)
+        image_bytes = input_pdf(pdf_file)
+        ai_response = get_ai_response(input_text, image_bytes, input_prompt4)
         st.write(ai_response)
