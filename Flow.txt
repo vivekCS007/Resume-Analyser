@@ -1,0 +1,9 @@
+Step 1 : Field to put JD
+
+Step 2: Upload pdf
+
+Step 3: PDF to Image
+
+Step 4: Image prcoessing google gemini
+
+Step 5: Template for Prompts(many)
