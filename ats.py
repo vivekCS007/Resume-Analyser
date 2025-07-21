@@ -57,7 +57,7 @@ submit4 = st.button("📊 Resume-job match %")
 # ------------------------------ Prompts ------------------------------ #
 
 input_prompt1 = """
-You are an experienced technical HR professional with expertise in Data Science, 
+You are an experienced technical HR professional with expertise in Data Science,
 Machine Learning, Full Stack Development,Big Data Engineering, DevOps, and Data Analytics.
 Carefully review the resume and compare it with the job description.
 
