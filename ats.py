@@ -15,6 +15,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API"))
 
 # ------------------------------ Utility Functions ------------------------------ #
 
+
 def get_ai_response(input_text, image_bytes, prompt):
     """Send job description, resume image, and prompt to Gemini AI"""
     model = genai.GenerativeModel('gemini-1.5-flash')
@@ -25,6 +26,7 @@ def get_ai_response(input_text, image_bytes, prompt):
     ])
     return response.text
 
+
 def input_pdf(pdf_file):
     """Convert first page of uploaded PDF to JPEG bytes"""
     if pdf_file is None:
@@ -33,6 +35,7 @@ def input_pdf(pdf_file):
     img_bytes = io.BytesIO()
     images[0].save(img_bytes, format='JPEG')
     return img_bytes.getvalue()
+
 
 # ------------------------------ Streamlit UI ------------------------------ #
 
@@ -54,7 +57,8 @@ submit4 = st.button("📊 Resume-job match %")
 # ------------------------------ Prompts ------------------------------ #
 
 input_prompt1 = """
-You are an experienced technical HR professional with expertise in Data Science, Full Stack Development, Big Data Engineering, DevOps, and Data Analytics.
+You are an experienced technical HR professional with expertise in Data Science, 
+Machine Learning, Full Stack Development,Big Data Engineering, DevOps, and Data Analytics.
 Carefully review the resume and compare it with the job description.
 
 Summarize the candidate’s:
@@ -98,6 +102,7 @@ Then explain the reasoning briefly.
 
 # ------------------------------ Actions ------------------------------ #
 
+
 def process_action(prompt):
     if not pdf_file:
         st.warning("⚠️ Please upload a resume first.")
@@ -105,6 +110,7 @@ def process_action(prompt):
     image_bytes = input_pdf(pdf_file)
     result = get_ai_response(input_text, image_bytes, prompt)
     st.markdown(result)
+
 
 if submit1:
     process_action(input_prompt1)
